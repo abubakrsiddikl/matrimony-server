@@ -1,18 +1,27 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const morgan = require("morgan");
 const port = process.env.PORT || 5000;
 const app = express();
 
 // use middleware
-app.use(cors());
-app.use(express());
+const corsOptions = {
+  origin: ["http://localhost:5173"],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(cookieParser());
 app.use(morgan("dev"));
 
-// connect to mongoDB
+// verify token middle ware
 
+// connect to mongoDB
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.lfjkv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
