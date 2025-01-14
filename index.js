@@ -42,7 +42,7 @@ run().catch(console.dir);
 
 // server root route
 app.get("/", (req, res) => {
-  res.send("matrimoni web server runing");
+  res.send("matrimoni web server runings.");
 });
 
 app.listen(port, () => {
