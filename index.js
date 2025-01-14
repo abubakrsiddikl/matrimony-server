@@ -42,6 +42,14 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
+
+    // jwt related apis
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACEESS_TOKEN_SECRET, {
+        expiresIn: "15d",
+      });
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
