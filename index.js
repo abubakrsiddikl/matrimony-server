@@ -70,6 +70,27 @@ async function run() {
         })
         .send({ success: true });
     });
+
+    // if user logout jwt delete
+    app.get("/logout", async (req, res) => {
+      res
+        .clearCookie("token", {
+          maxAge: 0,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        })
+        .send({ success: true });
+    });
+
+
+
+
+
+
+
+
+
+    
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
