@@ -57,6 +57,7 @@ async function run() {
     );
     // database collection
     const usersCollection = client.db("matrimony").collection("users");
+    const biodataCollection = client.db("matrimony").collection("biodata");
 
     // jwt related apis
     app.post("/jwt", async (req, res) => {
@@ -87,7 +88,7 @@ async function run() {
     // user related apis
     app.post("/users/:email", async (req, res) => {
       const email = req.params.email;
-      console.log(email)
+      console.log(email);
       const query = { email };
       const user = req.body;
       const isExists = await usersCollection.findOne(query);
@@ -99,6 +100,13 @@ async function run() {
         role: "normal",
         timestamp: Date.now(),
       });
+      res.send(result);
+    });
+
+    // bidata related apis
+    app.post("/biodata", verifyToken, async (req, res) => {
+      const biodata = req.body;
+      const result = await biodataCollection.insertOne(biodata);
       res.send(result);
     });
   } finally {
