@@ -55,6 +55,8 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
+    // database collection
+    const usersCollection = client.db("matrimony").collection("users");
 
     // jwt related apis
     app.post("/jwt", async (req, res) => {
@@ -82,15 +84,23 @@ async function run() {
         .send({ success: true });
     });
 
-
-
-
-
-
-
-
-
-    
+    // user related apis
+    app.post("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      console.log(email)
+      const query = { email };
+      const user = req.body;
+      const isExists = await usersCollection.findOne(query);
+      if (isExists) {
+        return res.send({ message: "user allready exists" });
+      }
+      const result = await usersCollection.insertOne({
+        ...user,
+        role: "normal",
+        timestamp: Date.now(),
+      });
+      res.send(result);
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
