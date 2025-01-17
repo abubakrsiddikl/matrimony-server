@@ -103,10 +103,28 @@ async function run() {
       res.send(result);
     });
 
+    // get user role
+    app.get("/users/role/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const result = await usersCollection.findOne({ email });
+      res.send({ role: result?.role });
+    });
+
     // bidata related apis
+    // post a biodata to db
     app.post("/biodata", verifyToken, async (req, res) => {
       const biodata = req.body;
+      const lastId = await biodataCollection.countDocuments();
+
       const result = await biodataCollection.insertOne(biodata);
+      res.send(result);
+    });
+
+    app.get("/biodata/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+
+      const result = await biodataCollection.findOne({ email });
+
       res.send(result);
     });
   } finally {
