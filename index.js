@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const morgan = require("morgan");
 const port = process.env.PORT || 5000;
 const app = express();
@@ -120,11 +120,24 @@ async function run() {
       res.send(result);
     });
 
+    // get biodata use email to db
     app.get("/biodata/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
-
       const result = await biodataCollection.findOne({ email });
+      res.send(result);
+    });
 
+    // get all biodata
+    app.get("/biodata", async (req, res) => {
+      const result = await biodataCollection.find().toArray();
+      res.send(result);
+    });
+
+    // get specify biodata to db
+    app.get("/biodata/details/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await biodataCollection.findOne(query);
       res.send(result);
     });
   } finally {
