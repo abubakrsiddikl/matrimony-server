@@ -148,6 +148,27 @@ async function run() {
       res.send(result);
     });
 
+    // sent to requset admin to biodata premium
+    app.patch("/biodata-premium/request/:email", async (req, res) => {
+      const email = req.params.email;
+      console.log(email)
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          isPremium: "requested",
+          status: "Requested",
+        },
+      };
+      const result = await biodataCollection.updateOne(
+        { email },
+        updateDoc,
+        options
+      );
+      res.send(result);
+    });
+
+    // 
+
     // favourites biodata related apis
     // add to favourites post to db
     app.post("/favourites-biodata", verifyToken, async (req, res) => {
@@ -166,7 +187,7 @@ async function run() {
     });
 
     // delete a favourites biodata to db
-    app.delete("/favourites-biodata/:id",verifyToken, async (req, res) => {
+    app.delete("/favourites-biodata/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const result = await favouritesBiodataCollection.deleteOne(filter);
