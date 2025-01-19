@@ -154,7 +154,7 @@ async function run() {
       verifyToken,
       async (req, res) => {
         const email = req.params.email;
-        console.log(email);
+        // console.log(email);
         const options = { upsert: true };
         const updateDoc = {
           $set: {
@@ -173,13 +173,33 @@ async function run() {
 
     // admin related apis
     // get  request to he/her biodata premium
-    app.get("/biodata-premium/request", async (req, res) => {
+    app.get("/biodata-premium/request", verifyToken, async (req, res) => {
       const query = {
         $or: [{ isPremium: "premium" }, { isPremium: "requested" }],
       };
       const filter = await biodataCollection.find(query).toArray();
       res.send(filter);
     });
+
+    // approved premium
+    app.patch(
+      "/biodata-premium/approved/:email",
+      verifyToken,
+      async (req, res) => {
+        const email = req.params.email;
+        const { id } = req.body;
+        const filter = { _id: new ObjectId(id) };
+        const updateDoc = {
+          $set: {
+            isPremium: "premium",
+            status: "Verified",
+          },
+        };
+
+        const result = await biodataCollection.updateOne(filter, updateDoc);
+        res.send(result);
+      }
+    );
 
     // favourites biodata related apis
     // add to favourites post to db
