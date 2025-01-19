@@ -58,6 +58,9 @@ async function run() {
     // database collection
     const usersCollection = client.db("matrimony").collection("users");
     const biodataCollection = client.db("matrimony").collection("biodata");
+    const favouritesBiodataCollection = client
+      .db("matrimony")
+      .collection("favouritesBiodata");
 
     // jwt related apis
     app.post("/jwt", async (req, res) => {
@@ -115,8 +118,12 @@ async function run() {
     app.post("/biodata", verifyToken, async (req, res) => {
       const biodata = req.body;
       const lastId = await biodataCollection.countDocuments();
+      const biodataId = lastId + 1;
 
-      const result = await biodataCollection.insertOne(biodata);
+      const result = await biodataCollection.insertOne({
+        ...biodata,
+        biodataId,
+      });
       res.send(result);
     });
 
@@ -138,6 +145,31 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await biodataCollection.findOne(query);
+      res.send(result);
+    });
+
+    // favourites biodata related apis
+    // add to favourites post to db
+    app.post("/favourites-biodata", verifyToken, async (req, res) => {
+      const biodata = req.body;
+      const result = await favouritesBiodataCollection.insertOne(biodata);
+      res.send(result);
+    });
+
+    // get favourites biodata by email
+    app.get("/favourites-biodata/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const result = await favouritesBiodataCollection
+        .find({ email })
+        .toArray();
+      res.send(result);
+    });
+
+    // delete a favourites biodata to db
+    app.delete("/favourites-biodata/:id",verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await favouritesBiodataCollection.deleteOne(filter);
       res.send(result);
     });
   } finally {
