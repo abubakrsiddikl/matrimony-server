@@ -149,25 +149,37 @@ async function run() {
     });
 
     // sent to requset admin to biodata premium
-    app.patch("/biodata-premium/request/:email", async (req, res) => {
-      const email = req.params.email;
-      console.log(email)
-      const options = { upsert: true };
-      const updateDoc = {
-        $set: {
-          isPremium: "requested",
-          status: "Requested",
-        },
-      };
-      const result = await biodataCollection.updateOne(
-        { email },
-        updateDoc,
-        options
-      );
-      res.send(result);
-    });
+    app.patch(
+      "/biodata-premium/request/:email",
+      verifyToken,
+      async (req, res) => {
+        const email = req.params.email;
+        console.log(email);
+        const options = { upsert: true };
+        const updateDoc = {
+          $set: {
+            isPremium: "requested",
+            status: "Requested",
+          },
+        };
+        const result = await biodataCollection.updateOne(
+          { email },
+          updateDoc,
+          options
+        );
+        res.send(result);
+      }
+    );
 
-    // 
+    // admin related apis
+    // get  request to he/her biodata premium
+    app.get("/biodata-premium/request", async (req, res) => {
+      const query = {
+        $or: [{ isPremium: "premium" }, { isPremium: "requested" }],
+      };
+      const filter = await biodataCollection.find(query).toArray();
+      res.send(filter);
+    });
 
     // favourites biodata related apis
     // add to favourites post to db
