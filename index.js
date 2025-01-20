@@ -228,6 +228,44 @@ async function run() {
       res.send(result);
     });
 
+    // mycontactRequest apis
+    app.get("/myContact-request/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const result = await paymentsCollection
+        .aggregate([
+          {
+            $match: {
+              email: email,
+            },
+          },
+          { $unwind: "$biodataId" },
+          {
+            $lookup: {
+              from: "biodata",
+              localField: "biodataId",
+              foreignField: "biodataId",
+              as: "biodata",
+            },
+          },
+          { $unwind: "$biodata" },
+          {
+            $project: {
+              _id: 0,
+              biodataId: 1,
+              transactionId: 1,
+              status: 1,
+              email: 1,
+              mobileNumber: "$biodata.mobileNumber",
+              contactEmail: "$biodata.email",
+              contactName: "$biodata.name",
+            },
+          },
+        ])
+        .toArray();
+
+      res.send(result);
+    });
+
     // payment related apis
     // create payment intent
     app.post("/create-payment-intent", verifyToken, async (req, res) => {
