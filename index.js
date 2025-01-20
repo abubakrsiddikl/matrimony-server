@@ -59,6 +59,7 @@ async function run() {
     // database collection
     const usersCollection = client.db("matrimony").collection("users");
     const biodataCollection = client.db("matrimony").collection("biodata");
+    const paymentsCollection = client.db("matrimony").collection("payments");
     const favouritesBiodataCollection = client
       .db("matrimony")
       .collection("favouritesBiodata");
@@ -227,6 +228,7 @@ async function run() {
       res.send(result);
     });
 
+    // payment related apis
     // create payment intent
     app.post("/create-payment-intent", verifyToken, async (req, res) => {
       const amount = 500;
@@ -238,6 +240,13 @@ async function run() {
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
+    });
+
+    // save payment information to db
+    app.post("/payment", async (req, res) => {
+      const paymentInfo = req.body;
+      const result = await paymentsCollection.insertOne(paymentInfo);
+      res.send(result);
     });
   } finally {
     // Ensures that the client will close when you finish/error
