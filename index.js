@@ -7,6 +7,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const morgan = require("morgan");
 const port = process.env.PORT || 5000;
 const app = express();
+const stripe = require("stripe")(process.env.PAYMENT_KEY);
 
 // use middleware
 const corsOptions = {
@@ -224,6 +225,19 @@ async function run() {
       const filter = { _id: new ObjectId(id) };
       const result = await favouritesBiodataCollection.deleteOne(filter);
       res.send(result);
+    });
+
+    // create payment intent
+    app.post("/create-payment-intent", verifyToken, async (req, res) => {
+      const amount = 500;
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
     });
   } finally {
     // Ensures that the client will close when you finish/error
