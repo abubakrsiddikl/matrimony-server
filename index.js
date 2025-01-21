@@ -90,6 +90,19 @@ async function run() {
         .send({ success: true });
     });
 
+    // verifyAdmin middleware
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.user?.email;
+      const query = { email };
+      const result = await usersCollection.findOne(query);
+      if (!result || result?.role !== "admin") {
+        return res
+          .status(403)
+          .send({ message: "Forbidden Accecss Admin only access" });
+      }
+      next();
+    };
+
     // user related apis
     app.post("/users/:email", async (req, res) => {
       const email = req.params.email;
@@ -202,6 +215,12 @@ async function run() {
         res.send(result);
       }
     );
+
+    // GET contact req info to db by admin
+    app.get("/contact-request", verifyToken, verifyAdmin, async (req, res) => {
+      const result = await paymentsCollection.find().toArray();
+      res.send(result);
+    });
 
     // favourites biodata related apis
     // add to favourites post to db
