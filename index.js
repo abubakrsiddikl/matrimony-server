@@ -252,8 +252,25 @@ async function run() {
     // get all users
     app.get("/users/:email", verifyToken, verifyAdmin, async (req, res) => {
       const email = req.params.email;
+      const { searchParams } = req.query;
+      console.log(searchParams);
       const query = { email: { $ne: email } };
+
+      if (searchParams) {
+        query.title = { $regex: searchParams, $options: "i" };
+      }
       const result = await usersCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    // update user role admin
+    app.patch("/user/role/:id", verifyToken, verifyAdmin, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: { role: "admin" },
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
 
