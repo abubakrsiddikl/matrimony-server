@@ -188,18 +188,24 @@ async function run() {
 
     // admin related apis
     // get  request to he/her biodata premium
-    app.get("/biodata-premium/request", verifyToken, async (req, res) => {
-      const query = {
-        $or: [{ isPremium: "premium" }, { isPremium: "requested" }],
-      };
-      const filter = await biodataCollection.find(query).toArray();
-      res.send(filter);
-    });
+    app.get(
+      "/biodata-premium/request",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        const query = {
+          $or: [{ isPremium: "premium" }, { isPremium: "requested" }],
+        };
+        const filter = await biodataCollection.find(query).toArray();
+        res.send(filter);
+      }
+    );
 
     // approved premium
     app.patch(
       "/biodata-premium/approved/:email",
       verifyToken,
+      verifyAdmin,
       async (req, res) => {
         const email = req.params.email;
         const { id } = req.body;
@@ -221,6 +227,27 @@ async function run() {
       const result = await paymentsCollection.find().toArray();
       res.send(result);
     });
+
+    // update status for contact request
+    app.patch(
+      "/approved-contact/request",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        const { email, biodataId } = req.body;
+        const query = {
+          email: email,
+          biodataId: biodataId,
+        };
+        const filter = await paymentsCollection.findOne(query);
+        console.log(filter);
+        const updateDoc = {
+          $set: { status: "Approved" },
+        };
+        const result = await paymentsCollection.updateOne(filter, updateDoc);
+        res.send(result);
+      }
+    );
 
     // favourites biodata related apis
     // add to favourites post to db
