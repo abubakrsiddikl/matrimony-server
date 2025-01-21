@@ -264,11 +264,22 @@ async function run() {
     });
 
     // update user role admin
-    app.patch("/user/role/:id", verifyToken, verifyAdmin, async (req, res) => {
+    app.patch("/user/role/admin/:id", verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: { role: "admin" },
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    // update user role premium
+    app.patch("/user/role/premium/:id", verifyToken, verifyAdmin, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: { role: "premium" },
       };
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.send(result);
