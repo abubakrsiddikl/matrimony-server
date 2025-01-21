@@ -257,7 +257,7 @@ async function run() {
       const query = { email: { $ne: email } };
 
       if (searchParams) {
-        query.title = { $regex: searchParams, $options: "i" };
+        query.name = { $regex: searchParams, $options: "i" };
       }
       const result = await usersCollection.find(query).toArray();
       res.send(result);
