@@ -249,6 +249,14 @@ async function run() {
       }
     );
 
+    // get all users
+    app.get("/users/:email", verifyToken, verifyAdmin, async (req, res) => {
+      const email = req.params.email;
+      const query = { email: { $ne: email } };
+      const result = await usersCollection.find(query).toArray();
+      res.send(result);
+    });
+
     // favourites biodata related apis
     // add to favourites post to db
     app.post("/favourites-biodata", verifyToken, async (req, res) => {
