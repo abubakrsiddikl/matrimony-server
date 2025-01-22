@@ -162,7 +162,17 @@ async function run() {
 
     // get all biodata
     app.get("/biodata", async (req, res) => {
-      const result = await biodataCollection.find().toArray();
+      const { limit, age, biodataType, permanentDivision } = req.query;
+      const filter = { isPremium: "premium" };
+      const query = {};
+      if (age) query.age = parseInt(age);
+      if (biodataType) query.biodataType = biodataType;
+      if (permanentDivision) query.permanentDivision = permanentDivision;
+      const finalQuery = { ...query };
+      const result = limit
+        ? await biodataCollection.find(filter).limit(Number(limit)).toArray()
+        : await biodataCollection.find(finalQuery).toArray();
+
       res.send(result);
     });
 
