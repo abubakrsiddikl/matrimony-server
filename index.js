@@ -50,12 +50,12 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
-    // // Send a ping to confirm a successful connection
-    // await client.db("admin").command({ ping: 1 });
-    // console.log(
-    //   "Pinged your deployment. You successfully connected to MongoDB!"
-    // );
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
     // database collection
     const usersCollection = client.db("matrimony").collection("users");
     const biodataCollection = client.db("matrimony").collection("biodata");
@@ -377,6 +377,47 @@ async function run() {
         .toArray();
 
       res.send(result);
+    });
+
+    // all calculate for user and revenue
+    app.get("/admin-dashboard", verifyToken, verifyAdmin, async (req, res) => {
+      // total biodat count
+      const totalBiodata = await biodataCollection.estimatedDocumentCount();
+      // total male biodata count
+      const totalMaleBiodata = await biodataCollection.countDocuments({
+        biodataType: "Male",
+      });
+      // total female biodata count
+      const totalFemaleBiodata = await biodataCollection.countDocuments({
+        biodataType: "Female",
+      });
+      // total premium biodata count
+      const totalPremiumBiodata = await biodataCollection.countDocuments({
+        isPremium: "premium",
+      });
+
+      // total revenue calculation
+      const totalContactPrice = await paymentsCollection
+        .aggregate([
+          {
+            $group: {
+              _id: null,
+              totalRevenue: {
+                $sum: "$amount",
+              },
+            },
+          },
+        ])
+        .toArray();
+      const revenue =
+        totalContactPrice.length > 0 ? totalContactPrice[0].totalRevenue : 0;
+      res.send({
+        revenue,
+        totalBiodata,
+        totalMaleBiodata,
+        totalFemaleBiodata,
+        totalPremiumBiodata,
+      });
     });
 
     // payment related apis
