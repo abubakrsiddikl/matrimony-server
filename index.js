@@ -380,7 +380,7 @@ async function run() {
     });
 
     // all calculate for user and revenue
-    app.get("/admin-dashboard", verifyToken, verifyAdmin, async (req, res) => {
+    app.get("/admin-stats", verifyToken, verifyAdmin, async (req, res) => {
       // total biodat count
       const totalBiodata = await biodataCollection.estimatedDocumentCount();
       // total male biodata count
@@ -439,6 +439,21 @@ async function run() {
       const paymentInfo = req.body;
       const result = await paymentsCollection.insertOne(paymentInfo);
       res.send(result);
+    });
+
+    // get user stats
+    app.get("/users-stats", async (req, res) => {
+      // total biodat count
+      const totalBiodata = await biodataCollection.estimatedDocumentCount();
+      // total Boys biodata count
+      const totalBoysBiodata = await biodataCollection.countDocuments({
+        biodataType: "Male",
+      });
+      // total girls biodata count
+      const totalGirlsBiodata = await biodataCollection.countDocuments({
+        biodataType: "Female",
+      });
+      res.send({ totalBiodata, totalBoysBiodata, totalGirlsBiodata });
     });
   } finally {
     // Ensures that the client will close when you finish/error
