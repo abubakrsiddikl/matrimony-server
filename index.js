@@ -348,7 +348,7 @@ async function run() {
       }
     );
 
-    // favourites biodata related apis
+    // favourite biodata related apis
     // add to favourites post to db
     app.post("/favourites-biodata", verifyToken, async (req, res) => {
       const biodata = req.body;
