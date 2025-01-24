@@ -11,7 +11,11 @@ const stripe = require("stripe")(process.env.PAYMENT_KEY);
 
 // use middleware
 const corsOptions = {
-  origin: ["http://localhost:5173"],
+  origin: [
+    "http://localhost:5173",
+    "https://matrimony-5930a.web.app",
+    "https://matrimony-5930a.firebaseapp.com",
+  ],
   credentials: true,
   optionsSuccessStatus: 200,
 };
