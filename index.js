@@ -220,7 +220,10 @@ async function run() {
 
     // get a story to db
     app.get("/success-story", async (req, res) => {
-      const result = await successStoryCollection.find().sort({marrigeDate: -1}).toArray();
+      const result = await successStoryCollection
+        .find()
+        .sort({ marrigeDate: -1 })
+        .toArray();
       res.send(result);
     });
 
@@ -329,6 +332,18 @@ async function run() {
           $set: { role: "premium" },
         };
         const result = await usersCollection.updateOne(filter, updateDoc);
+        res.send(result);
+      }
+    );
+    app.get(
+      "/success-story/admin",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        const result = await successStoryCollection
+          .find()
+          .sort({ marrigeDate: -1 })
+          .toArray();
         res.send(result);
       }
     );
