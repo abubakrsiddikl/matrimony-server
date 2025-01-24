@@ -220,7 +220,7 @@ async function run() {
 
     // get a story to db
     app.get("/success-story", async (req, res) => {
-      const result = await successStoryCollection.find().toArray();
+      const result = await successStoryCollection.find().sort({marrigeDate: -1}).toArray();
       res.send(result);
     });
 
