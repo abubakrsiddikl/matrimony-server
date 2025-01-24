@@ -63,6 +63,9 @@ async function run() {
     const favouritesBiodataCollection = client
       .db("matrimony")
       .collection("favouritesBiodata");
+    const successStoryCollection = client
+      .db("matrimony")
+      .collection("successStory");
 
     // jwt related apis
     app.post("/jwt", async (req, res) => {
@@ -206,6 +209,20 @@ async function run() {
         res.send(result);
       }
     );
+
+    // success stroy related apis
+    // saved a story to db
+    app.post("/success-story", verifyToken, async (req, res) => {
+      const story = req.body;
+      const result = await successStoryCollection.insertOne(story);
+      res.send(result);
+    });
+
+    // get a story to db
+    app.get("/success-story", verifyToken, async (req, res) => {
+      const result = await successStoryCollection.find().toArray();
+      res.send(result);
+    });
 
     // admin related apis
     // get  request to he/her biodata premium
