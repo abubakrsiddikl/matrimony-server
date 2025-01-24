@@ -219,7 +219,7 @@ async function run() {
     });
 
     // get a story to db
-    app.get("/success-story", verifyToken, async (req, res) => {
+    app.get("/success-story", async (req, res) => {
       const result = await successStoryCollection.find().toArray();
       res.send(result);
     });
@@ -470,7 +470,16 @@ async function run() {
       const totalGirlsBiodata = await biodataCollection.countDocuments({
         biodataType: "Female",
       });
-      res.send({ totalBiodata, totalBoysBiodata, totalGirlsBiodata });
+
+      // marrige compeleted count
+      const totalMarrigeComplete =
+        await successStoryCollection.estimatedDocumentCount();
+      res.send({
+        totalBiodata,
+        totalBoysBiodata,
+        totalGirlsBiodata,
+        totalMarrigeComplete,
+      });
     });
   } finally {
     // Ensures that the client will close when you finish/error
