@@ -54,12 +54,12 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // await client.connect();
+    // // Send a ping to confirm a successful connection
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
     // database collection
     const usersCollection = client.db("matrimony").collection("users");
     const biodataCollection = client.db("matrimony").collection("biodata");
@@ -113,7 +113,7 @@ async function run() {
     // user related apis
     app.post("/users/:email", async (req, res) => {
       const email = req.params.email;
-      console.log(email);
+      // console.log(email);
       const query = { email };
       const user = req.body;
       const isExists = await usersCollection.findOne(query);
@@ -285,7 +285,7 @@ async function run() {
           biodataId: biodataId,
         };
         const filter = await paymentsCollection.findOne(query);
-        console.log(filter);
+        // console.log(filter);
         const updateDoc = {
           $set: { status: "Approved" },
         };
@@ -298,7 +298,7 @@ async function run() {
     app.get("/users/:email", verifyToken, verifyAdmin, async (req, res) => {
       const email = req.params.email;
       const { searchParams } = req.query;
-      console.log(searchParams);
+      // console.log(searchParams);
       const query = { email: { $ne: email } };
 
       if (searchParams) {
