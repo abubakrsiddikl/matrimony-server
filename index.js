@@ -1,5 +1,9 @@
 require("dotenv").config();
 const express = require("express");
+const SSLCommerzPayment = require('sslcommerz-lts')
+const store_id = process.env.SSL_STORE_ID
+const store_passwd = process.env.SSL_STORE_PASSWORD
+const is_live = false
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
@@ -70,6 +74,9 @@ async function run() {
     const successStoryCollection = client
       .db("matrimony")
       .collection("successStory");
+    const testimonialsCollection = client
+      .db("matrimony")
+      .collection("testimonials");
 
     // jwt related apis
     app.post("/jwt", async (req, res) => {
@@ -133,6 +140,17 @@ async function run() {
       const email = req.params.email;
       const result = await usersCollection.findOne({ email });
       res.send({ role: result?.role });
+    });
+
+    //testimonials related
+    app.post("/testimonials", verifyToken, async (req, res) => {
+      const testimonials = req.body;
+      const result = await testimonialsCollection.insertOne(testimonials);
+      res.send(result);
+    });
+    app.get("/testimonials", async (req, res) => {
+      const result = await testimonialsCollection.find().toArray();
+      res.send(result);
     });
 
     // bidata related apis
@@ -475,6 +493,12 @@ async function run() {
       const paymentInfo = req.body;
       const result = await paymentsCollection.insertOne(paymentInfo);
       res.send(result);
+    });
+
+    // ! ssl commerze payment route
+    app.post("/sslCommerze", async (req, res) => {
+      const paymentInfo = req.body;
+      console.log(paymentInfo);
     });
 
     // get user stats
