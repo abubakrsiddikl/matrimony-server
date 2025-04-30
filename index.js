@@ -505,7 +505,7 @@ async function run() {
         currency: "BDT",
         tran_id: "REF123", // use unique tran_id for each api call
         success_url: `http://localhost:5000/paymetn/success/${tran_id}`,
-        fail_url: "http://localhost:3030/fail",
+        fail_url: `http://localhost:5000/paymetn/fail/${tran_id}`,
         cancel_url: "http://localhost:3030/cancel",
         ipn_url: "http://localhost:3030/ipn",
         shipping_method: "Courier",
@@ -530,7 +530,6 @@ async function run() {
         ship_postcode: 8300,
         ship_country: "Bangladesh",
       };
-      console.log(data);
       const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live);
       sslcz.init(data).then((apiResponse) => {
         // Redirect the user to payment gateway
@@ -562,6 +561,14 @@ async function run() {
         res.redirect(
           `http://localhost:5173/payment/success/${req.params.tranId}`
         );
+      }
+    });
+    app.post("/paymetn/fail/:tranId", async (req, res) => {
+      const result = await paymentsCollection.deleteOne({
+        transactionId: req.params.tranId,
+      });
+      if (result.deletedCount > 0) {
+        res.redirect(`http://localhost:5173/payment/fail/${req.params.tranId}`);
       }
     });
 
