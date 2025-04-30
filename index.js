@@ -526,8 +526,8 @@ async function run() {
         ship_add1: "Dhaka",
         ship_add2: "Dhaka",
         ship_city: "Dhaka",
-        ship_state: "Dhaka",
-        ship_postcode: 1000,
+        ship_state: "Bhola Sadar",
+        ship_postcode: 8300,
         ship_country: "Bangladesh",
       };
       console.log(data);
