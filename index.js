@@ -536,12 +536,33 @@ async function run() {
         // Redirect the user to payment gateway
         let GatewayPageURL = apiResponse.GatewayPageURL;
         res.send({ url: GatewayPageURL });
+        const finalPaymentInfo = {
+          ...paymentInfo,
+          transactionId: tran_id,
+          paid_status: false,
+        };
+        const result = paymentsCollection.insertOne(finalPaymentInfo);
         console.log("Redirecting to: ", GatewayPageURL);
       });
     });
 
     app.post("/paymetn/success/:tranId", async (req, res) => {
       console.log(req.params.tranId);
+      const result = await paymentsCollection.updateOne(
+        {
+          transactionId: req.params.tranId,
+        },
+        {
+          $set: {
+            paid_status: true,
+          },
+        }
+      );
+      if (result.modifiedCount > 0) {
+        res.redirect(
+          `http://localhost:5173/payment/success/${req.params.tranId}`
+        );
+      }
     });
 
     // get user stats
