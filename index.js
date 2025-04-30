@@ -504,7 +504,7 @@ async function run() {
         total_amount: process.env.PRICE,
         currency: "BDT",
         tran_id: "REF123", // use unique tran_id for each api call
-        success_url: "http://localhost:3030/success",
+        success_url: `http://localhost:5000/paymetn/success/${tran_id}`,
         fail_url: "http://localhost:3030/fail",
         cancel_url: "http://localhost:3030/cancel",
         ipn_url: "http://localhost:3030/ipn",
@@ -530,14 +530,18 @@ async function run() {
         ship_postcode: 1000,
         ship_country: "Bangladesh",
       };
-      console.log(data)
-      // const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live)
-      // sslcz.init(data).then(apiResponse => {
-      //     // Redirect the user to payment gateway
-      //     let GatewayPageURL = apiResponse.GatewayPageURL
-      //     res.redirect(GatewayPageURL)
-      //     console.log('Redirecting to: ', GatewayPageURL)
-      // });
+      console.log(data);
+      const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live);
+      sslcz.init(data).then((apiResponse) => {
+        // Redirect the user to payment gateway
+        let GatewayPageURL = apiResponse.GatewayPageURL;
+        res.send({ url: GatewayPageURL });
+        console.log("Redirecting to: ", GatewayPageURL);
+      });
+    });
+
+    app.post("/paymetn/success/:tranId", async (req, res) => {
+      console.log(req.params.tranId);
     });
 
     // get user stats
